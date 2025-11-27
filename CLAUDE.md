@@ -1,46 +1,58 @@
-# Skill Creation Pipeline
+# CLAUDE.md
 
-This repository contains a complete pipeline for harvesting knowledge from external sources and transforming it into Claude Code skills.
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Purpose
+## What This Repository Does
 
-Convert external sources (YouTube videos, GitHub repos, blog articles, n8n workflows) into production-ready Claude Code skills through a systematic pipeline.
+A skill creation pipeline that transforms external sources (YouTube videos, GitHub repos, blog articles, n8n workflows) into production-ready Claude Code skills.
 
-## Pipeline Overview
-
-```
-Source → harvest-sources → create-agent-skills → audit-skill → test → heal-skill
-```
-
-## Directory Structure
+## Pipeline Flow
 
 ```
-skill/
-├── harvest-sources/        # Extract knowledge from external sources
-├── create-agent-skills/    # Build skills from harvested knowledge
-├── debug-like-expert/      # Methodical debugging for complex issues
-├── commands/
-│   ├── audit-skill.md      # Validate skill compliance
-│   └── heal-skill.md       # Fix skills based on execution feedback
-└── agents/
-    └── skill-auditor.md    # Subagent for compliance audits
+Source URL → harvest-sources → create-agent-skills → audit-skill → heal-skill
 ```
 
-## Quick Start
+1. **harvest-sources**: Extracts knowledge from URLs, outputs `<harvested_source>` XML
+2. **create-agent-skills**: Transforms harvested knowledge into skill files
+3. **audit-skill**: Validates compliance (invokes skill-auditor agent)
+4. **heal-skill**: Fixes skills based on execution feedback
+5. **debug-like-expert**: Deep debugging for complex failures
 
-1. **Harvest a source**: Provide a URL (GitHub, YouTube, blog, n8n) to `harvest-sources`
-2. **Create skill**: Use `create-agent-skills` with the harvested output
-3. **Audit**: Run `audit-skill` to validate compliance
-4. **Test**: Invoke the skill and observe behavior
-5. **Heal**: Use `heal-skill` if issues are found
+## Architecture
 
-## Skill Best Practices
+Skills follow a router pattern with progressive disclosure:
 
-- YAML frontmatter: name ≤64 chars, description ≤1024 chars
-- Pure XML structure (no markdown headings in skill body)
-- Required sections: `<objective>`, `<quick_start>` or `<intake>`, `<success_criteria>`
-- Keep SKILL.md under 500 lines (use progressive disclosure)
+```
+skill-name/
+├── SKILL.md              # Router + essential principles (≤500 lines)
+├── workflows/            # Step-by-step procedures
+├── references/           # Domain knowledge
+└── templates/            # Output structures
+```
 
-## Ignored Files
+**Key constraint**: SKILL.md uses pure XML structure—no markdown headings (`#`, `##`) in the body. Use semantic tags like `<objective>`, `<process>`, `<success_criteria>`.
 
-The dbt project files in this repo are legacy and not relevant to skill development. They are excluded via .gitignore.
+## Skill File Requirements
+
+YAML frontmatter:
+- `name`: lowercase-hyphenated, ≤64 chars, matches directory name
+- `description`: ≤1024 chars, third person, includes WHAT it does AND WHEN to use it
+
+Required XML sections:
+- `<objective>` - Purpose and significance
+- `<intake>` or `<quick_start>` - Entry point
+- `<success_criteria>` - Verification checklist
+
+## Data Flow Between Skills
+
+harvest-sources outputs a `<skill_ready>` section containing:
+- `suggested_skill_name`
+- `suggested_description`
+- `core_capabilities`
+- `suggested_workflow`
+
+create-agent-skills consumes this via `workflows/from-harvest.md` to generate compliant skill files.
+
+## Ignored Content
+
+The dbt project files (models/, data/, tests/, etc.) are legacy and excluded via .gitignore.
