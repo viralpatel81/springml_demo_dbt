@@ -1,0 +1,17 @@
+# DBT project files (legacy - not relevant for skill development)
+models/
+data/
+tests/
+target/
+logs/
+dbt_project.yml
+profiles.yml
+Dockerfile
+
+# DBT artifacts
+*.pickle
+dbt_modules/
+
+# Credentials (never commit)
+*credentials*.json
+.env
